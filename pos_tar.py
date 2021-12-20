@@ -19,13 +19,14 @@ class FLIGHT_CONTROLLER:
 
 	def __init__(self):
 		self.pt = Point()
+		self.vel = Point()
 
 		#NODE
 		rospy.init_node('iris_drone', anonymous = True)
 
 		#SUBSCRIBERS																	
 		rospy.Subscriber('/mavros/local_position/pose', PoseStamped, self.get_pose)
-		# self.get_linear_vel=rospy.Subscriber('/mavros/local_position/velocity_local', TwistStamped, self.get_vel,)
+		self.get_linear_vel=rospy.Subscriber('/mavros/local_position/velocity', TwistStamped, self.get_vel,)
 		self.get_imu_data=rospy.Subscriber('/mavros/imu/data',Imu,self.get_euler_angles)
 
 		#PUBLISHERS
@@ -90,6 +91,11 @@ class FLIGHT_CONTROLLER:
 		self.pt.y = location_data.pose.position.y
 		self.pt.z = location_data.pose.position.z
 
+	def get_vel(self, location_data):
+		self.vel.x = location_data.twist.linear.x
+		self.vel.y = location_data.twist.linear.y
+		self.vel.z = location_data.twist.linear.z
+
 	def get_euler_angles(self,orientaion_data):
 		orientation_q = orientaion_data.orientation
 		orientation_list = [orientation_q.x, orientation_q.y, orientation_q.z, orientation_q.w]
@@ -115,19 +121,19 @@ class FLIGHT_CONTROLLER:
 		#print('Reached ',x,y,z)
 
 
-	def set_pos(self, a_x, a_y, a_z, v_x, v_z, v_y, x, y, z):
+	def set_pos(self, a_x, a_y, a_z):
 		sp = PositionTarget()
 		sp.coordinate_frame = 1
 		sp.type_mask = 3072				
 		sp.acceleration_or_force.x = a_x
 		sp.acceleration_or_force.y = a_y
 		sp.acceleration_or_force.z = a_z
-		sp.velocity.x = v_x
-		sp.velocity.y = v_y
-		sp.velocity.z = v_z
-		sp.position.x = x
-		sp.position.y = y
-		sp.position.z = z
+		# sp.velocity.x = v_x
+		# sp.velocity.y = v_y
+		# sp.velocity.z = v_z
+		# sp.position.x = p_x
+		# sp.position.y = p_y
+		# sp.position.z = p_z
 		self.publish_pos_tar.publish(sp)
 
 
@@ -144,6 +150,8 @@ if __name__ == '__main__':
 	v_test = 2
 	v_min=0.1
 	v_max=15
+	kp_pos = np.array([200,200,169])
+	kd_pos = np.array([24,24,26])
 	ms = min_snap(x,y,z,v_test,v_min,v_max)
 	ms.optimize()
 	ms.get_trajectory_var()
@@ -154,29 +162,21 @@ if __name__ == '__main__':
 	mav.takeoff(5)
 	time.sleep(10)
 	print("Starting")
-
 	n = len(ms.x_path)
-	i = 0
+
+	#PID 
 	x_actual = []
 	y_actual = []
 	z_actual = []
-	for i in range(n):
-		print("Traj")
-		a_x = ms.x_dot_dot_path[i]
-		a_y = ms.y_dot_dot_path[i]
-		a_z = ms.z_dot_dot_path[i]
-		v_x = ms.x_dot_path[i]
-		v_y = ms.y_dot_path[i]
-		v_z = ms.z_dot_path[i]
-		x = ms.x_path[i]
-		y = ms.y_path[i]
-		z = ms.z_path[i]
-		i = i+1
-		mav.set_pos(a_x, a_y, a_z, v_x, v_y, v_z, x, y, z)
+	for j in range(n):
+		a_x = kp_pos[0]*(ms.x_path[j]-mav.pt.x) + kd_pos[0]*(ms.x_dot_path[j]-mav.vel.x) + ms.x_dot_dot_path[j]
+		a_y = kp_pos[1]*(ms.y_path[j]-mav.pt.y) + kd_pos[1]*(ms.y_dot_path[j]-mav.vel.y) + ms.y_dot_dot_path[j]
+		a_z = kp_pos[2]*(ms.z_path[j]-mav.pt.z) + kd_pos[2]*(ms.z_dot_path[j]-mav.vel.z) + ms.z_dot_dot_path[j]
+		mav.set_pos(a_x, a_y, a_z)
 		x_actual.append(mav.pt.x)
 		y_actual.append(mav.pt.y)
 		z_actual.append(mav.pt.z)
-		rate.sleep()
+		rate.sleep()		
 		
 	ax = plt.axes(projection ='3d')
 	ax.scatter(ms.x, ms.y, ms.z, c='black',marker='o',s=20)
