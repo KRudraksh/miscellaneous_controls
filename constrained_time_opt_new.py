@@ -197,35 +197,35 @@ class min_snap:
         self.J=(self.scale_fac*(np.matmul(np.matmul(np.transpose(p_x),Q),p_x))) +(self.scale_fac*(np.matmul(np.matmul(np.transpose(p_y),Q),p_y)))+(self.scale_fac*(np.matmul(np.matmul(np.transpose(p_z),Q),p_z)))+ (K*(t[-1]-t[0]))
         return self.J
     
-    def plot_test_case(self,colr,label):
-        cost_test_case=self.cost_func(self.t_interval)
-        self.plot(colr,label)
+    # def plot_test_case(self,colr,label):
+    #     cost_test_case=self.cost_func(self.t_interval)
+    #     self.plot(colr,label)
         
 
 
-    def plot(self,colr,label):
-        #ax = plt.axes(projection ='3d')
+    # def plot(self,colr,label):
+    #     #ax = plt.axes(projection ='3d')
 
-        ax.scatter(self.x, self.y, self.z, c='black',marker='o',s=20)
+    #     ax.scatter(self.x, self.y, self.z, c='black',marker='o',s=20)
 
-        for v in range(self.m):
-            w,u,a=[],[],[]
+    #     for v in range(self.m):
+    #         w,u,a=[],[],[]
             
-            r=np.linspace(self.t[v],self.t[v+1],100)
-            for i in range(100):
-                g,e,f=0,0,0
-                for j in range(self.n*v,(v+1)*self.n):
-                    g=g+(self.p_x[j]*pow(r[i],j-(self.n*v)))
-                    e=e+(self.p_y[j]*pow(r[i],j-(self.n*v)))
-                    f=f+(self.p_z[j]*pow(r[i],j-(self.n*v)))
-                w.append(g)
-                u.append(e)
-                a.append(f)
-            ax.plot3D(w, u, a, colr)
+    #         r=np.linspace(self.t[v],self.t[v+1],100)
+    #         for i in range(100):
+    #             g,e,f=0,0,0
+    #             for j in range(self.n*v,(v+1)*self.n):
+    #                 g=g+(self.p_x[j]*pow(r[i],j-(self.n*v)))
+    #                 e=e+(self.p_y[j]*pow(r[i],j-(self.n*v)))
+    #                 f=f+(self.p_z[j]*pow(r[i],j-(self.n*v)))
+    #             w.append(g)
+    #             u.append(e)
+    #             a.append(f)
+    #         ax.plot3D(w, u, a, colr)
            
         
-        ax.plot3D(w, u, a, colr,label=label)
-        #plt.show()
+    #     ax.plot3D(w, u, a, colr,label=label)
+    #     #plt.show()
 
     def give_intervals(self,t):
         m=[]
@@ -321,30 +321,30 @@ class min_snap:
         
 
 
-if __name__ == '__main__':
-    x=[0,5,5,0,0]
-    y=[0,0,5,5,0]
-    z=[5,5,5,5,5]
-    v_test = 2
-    v_min=0.1
-    v_max=15
+# if __name__ == '__main__':
+#     x=[0,5,5,0,0]
+#     y=[0,0,5,5,0]
+#     z=[5,5,5,5,5]
+#     v_test = 2
+#     v_min=0.1
+#     v_max=15
 
-    plt.figure(figsize=(10,5))
-    ax = plt.axes(projection ='3d')
+#     plt.figure(figsize=(10,5))
+#     ax = plt.axes(projection ='3d')
 
-    ms = min_snap(x,y,z,v_test,v_min,v_max)
+#     ms = min_snap(x,y,z,v_test,v_min,v_max)
 
-    ms.plot_test_case('r','Test Case Trajectory')
+#     ms.plot_test_case('r','Test Case Trajectory')
 
-    ms.optimize()
+#     ms.optimize()
 
-    ms.get_trajectory_var()
+#     ms.get_trajectory_var()
     
 
-    ms.plot('g','Time Optimized Trajectory')
+#     ms.plot('g','Time Optimized Trajectory')
     
-    plt.legend()
-    plt.show()
-    print(ms.x_dot_dot_path)
-    print(ms.y_dot_dot_path)
-    print(ms.z_dot_dot_path)
+#     plt.legend()
+#     plt.show()
+#     print(ms.x_dot_dot_path)
+#     print(ms.y_dot_dot_path)
+#     print(ms.z_dot_dot_path)
