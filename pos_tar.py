@@ -26,7 +26,7 @@ class FLIGHT_CONTROLLER:
 
 		#SUBSCRIBERS																	
 		rospy.Subscriber('/mavros/local_position/pose', PoseStamped, self.get_pose)
-		self.get_linear_vel=rospy.Subscriber('/mavros/local_position/velocity', TwistStamped, self.get_vel,)
+		self.get_linear_vel=rospy.Subscriber('/mavros/local_position/velocity_local', TwistStamped, self.get_vel)
 		self.get_imu_data=rospy.Subscriber('/mavros/imu/data',Imu,self.get_euler_angles)
 
 		#PUBLISHERS
@@ -150,8 +150,8 @@ if __name__ == '__main__':
 	v_test = 2
 	v_min=0.1
 	v_max=15
-	kp_pos = np.array([200,200,169])
-	kd_pos = np.array([24,24,26])
+	kp_pos = np.array([19,19,20])
+	kd_pos = np.array([14,14,15])
 	ms = min_snap(x,y,z,v_test,v_min,v_max)
 	ms.optimize()
 	ms.get_trajectory_var()
@@ -169,6 +169,7 @@ if __name__ == '__main__':
 	y_actual = []
 	z_actual = []
 	for j in range(n):
+		print(mav.vel.x)
 		a_x = kp_pos[0]*(ms.x_path[j]-mav.pt.x) + kd_pos[0]*(ms.x_dot_path[j]-mav.vel.x) + ms.x_dot_dot_path[j]
 		a_y = kp_pos[1]*(ms.y_path[j]-mav.pt.y) + kd_pos[1]*(ms.y_dot_path[j]-mav.vel.y) + ms.y_dot_dot_path[j]
 		a_z = kp_pos[2]*(ms.z_path[j]-mav.pt.z) + kd_pos[2]*(ms.z_dot_path[j]-mav.vel.z) + ms.z_dot_dot_path[j]
@@ -177,6 +178,12 @@ if __name__ == '__main__':
 		y_actual.append(mav.pt.y)
 		z_actual.append(mav.pt.z)
 		rate.sleep()		
+	
+	for k in range(50):
+		x_actual.append(mav.pt.x)
+		y_actual.append(mav.pt.y)
+		z_actual.append(mav.pt.z)
+		rate.sleep()
 		
 	ax = plt.axes(projection ='3d')
 	ax.scatter(ms.x, ms.y, ms.z, c='black',marker='o',s=20)
