@@ -131,12 +131,12 @@ class FLIGHT_CONTROLLER:
 		self.publish_pos_tar.publish(sp)
 
 
-
 if __name__ == '__main__':
 
 	
 	mav = FLIGHT_CONTROLLER()
 	rate = rospy.Rate(10)
+	rate_f = rospy.Rate(100)
 
 	x = [0,5,5,0,0]
 	y = [0,0,5,5,0]
@@ -154,8 +154,13 @@ if __name__ == '__main__':
 	mav.takeoff(5)
 	time.sleep(10)
 	print("Starting")
+
+	n = len(ms.x_path)
 	i = 0
-	while (True):
+	x_actual = []
+	y_actual = []
+	z_actual = []
+	for i in range(n):
 		print("Traj")
 		a_x = ms.x_dot_dot_path[i]
 		a_y = ms.y_dot_dot_path[i]
@@ -168,9 +173,33 @@ if __name__ == '__main__':
 		z = ms.z_path[i]
 		i = i+1
 		mav.set_pos(a_x, a_y, a_z, v_x, v_y, v_z, x, y, z)
+		x_actual.append(mav.pt.x)
+		y_actual.append(mav.pt.y)
+		z_actual.append(mav.pt.z)
 		rate.sleep()
-	
-	plt.figure(figsize=(10,5))
+		
 	ax = plt.axes(projection ='3d')
-	ms.plot('g','Time Optimized Trajectory')
+	ax.scatter(ms.x, ms.y, ms.z, c='black',marker='o',s=20)
 
+	for v in range(ms.m):
+		w,u,a=[],[],[]
+		r=np.linspace(ms.t[v],ms.t[v+1],100)
+		for i in range(100):
+			g,e,f=0,0,0
+			for j in range(ms.n*v,(v+1)*ms.n):
+				g=g+(ms.p_x[j]*pow(r[i],j-(ms.n*v)))
+				e=e+(ms.p_y[j]*pow(r[i],j-(ms.n*v)))
+				f=f+(ms.p_z[j]*pow(r[i],j-(ms.n*v)))
+			w.append(g)
+			u.append(e)
+			a.append(f)
+		ax.plot3D(w, u, a, 'r')
+		   
+		
+	ax.plot3D(w, u, a, 'r' ,label='Time Optimized')
+	print(n)	
+	
+	print(x_actual)
+	ax.scatter(x_actual, y_actual, z_actual, c='green',marker='o',s=15, label='Actual Trajectory' )
+	plt.legend()
+	plt.show()
