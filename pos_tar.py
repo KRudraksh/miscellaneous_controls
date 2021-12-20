@@ -10,6 +10,9 @@ from geometry_msgs.msg import PoseStamped, Pose, Point, Twist, TwistStamped
 from tf.transformations import euler_from_quaternion, quaternion_from_euler
 from time import sleep
 from constrained_time_opt_new import min_snap
+from math import factorial as f
+import matplotlib.pyplot as plt
+from mpl_toolkits import mplot3d
 
 
 class FLIGHT_CONTROLLER:
@@ -27,7 +30,7 @@ class FLIGHT_CONTROLLER:
 
 		#PUBLISHERS
 		self.publish_pose = rospy.Publisher('/mavros/setpoint_position/local', PoseStamped,queue_size=10)
-		self.publish_pos_tar = rospy.Publisher('/mavros/setpoint_raw/		local', PositionTarget,queue_size=0)
+		self.publish_pos_tar = rospy.Publisher('/mavros/setpoint_raw/local', PositionTarget,queue_size=0)
 
 		#SERVICES
 		self.arm_service = rospy.ServiceProxy('/mavros/cmd/arming', CommandBool)
@@ -166,3 +169,8 @@ if __name__ == '__main__':
 		i = i+1
 		mav.set_pos(a_x, a_y, a_z, v_x, v_y, v_z, x, y, z)
 		rate.sleep()
+	
+	plt.figure(figsize=(10,5))
+	ax = plt.axes(projection ='3d')
+	ms.plot('g','Time Optimized Trajectory')
+

@@ -203,29 +203,29 @@ class min_snap:
         
 
 
-    # def plot(self,colr,label):
-    #     #ax = plt.axes(projection ='3d')
+    def plot(self,colr,label):
+        #ax = plt.axes(projection ='3d')
 
-    #     ax.scatter(self.x, self.y, self.z, c='black',marker='o',s=20)
+        ax.scatter(self.x, self.y, self.z, c='black',marker='o',s=20)
 
-    #     for v in range(self.m):
-    #         w,u,a=[],[],[]
+        for v in range(self.m):
+            w,u,a=[],[],[]
             
-    #         r=np.linspace(self.t[v],self.t[v+1],100)
-    #         for i in range(100):
-    #             g,e,f=0,0,0
-    #             for j in range(self.n*v,(v+1)*self.n):
-    #                 g=g+(self.p_x[j]*pow(r[i],j-(self.n*v)))
-    #                 e=e+(self.p_y[j]*pow(r[i],j-(self.n*v)))
-    #                 f=f+(self.p_z[j]*pow(r[i],j-(self.n*v)))
-    #             w.append(g)
-    #             u.append(e)
-    #             a.append(f)
-    #         ax.plot3D(w, u, a, colr)
+            r=np.linspace(self.t[v],self.t[v+1],100)
+            for i in range(100):
+                g,e,f=0,0,0
+                for j in range(self.n*v,(v+1)*self.n):
+                    g=g+(self.p_x[j]*pow(r[i],j-(self.n*v)))
+                    e=e+(self.p_y[j]*pow(r[i],j-(self.n*v)))
+                    f=f+(self.p_z[j]*pow(r[i],j-(self.n*v)))
+                w.append(g)
+                u.append(e)
+                a.append(f)
+            ax.plot3D(w, u, a, colr)
            
         
-    #     ax.plot3D(w, u, a, colr,label=label)
-    #     #plt.show()
+        ax.plot3D(w, u, a, colr,label=label)
+        #plt.show()
 
     def give_intervals(self,t):
         m=[]
@@ -330,7 +330,7 @@ class min_snap:
 #     v_max=15
 
 #     plt.figure(figsize=(10,5))
-#     ax = plt.axes(projection ='3d')
+    ax = plt.axes(projection ='3d')
 
 #     ms = min_snap(x,y,z,v_test,v_min,v_max)
 
