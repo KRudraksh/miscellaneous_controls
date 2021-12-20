@@ -112,13 +112,19 @@ class FLIGHT_CONTROLLER:
 		#print('Reached ',x,y,z)
 
 
-	def set_pos(self, a_x, a_y, a_z):
+	def set_pos(self, a_x, a_y, a_z, v_x, v_z, v_y, x, y, z):
 		sp = PositionTarget()
 		sp.coordinate_frame = 1
-		sp.type_mask = 3135					
+		sp.type_mask = 3072				
 		sp.acceleration_or_force.x = a_x
 		sp.acceleration_or_force.y = a_y
 		sp.acceleration_or_force.z = a_z
+		sp.velocity.x = v_x
+		sp.velocity.y = v_y
+		sp.velocity.z = v_z
+		sp.position.x = x
+		sp.position.y = y
+		sp.position.z = z
 		self.publish_pos_tar.publish(sp)
 
 
@@ -151,6 +157,12 @@ if __name__ == '__main__':
 		a_x = ms.x_dot_dot_path[i]
 		a_y = ms.y_dot_dot_path[i]
 		a_z = ms.z_dot_dot_path[i]
+		v_x = ms.x_dot_path[i]
+		v_y = ms.y_dot_path[i]
+		v_z = ms.z_dot_path[i]
+		x = ms.x_path[i]
+		y = ms.y_path[i]
+		z = ms.z_path[i]
 		i = i+1
-		mav.set_pos(a_x, a_y, a_z)
+		mav.set_pos(a_x, a_y, a_z, v_x, v_y, v_z, x, y, z)
 		rate.sleep()
