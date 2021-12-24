@@ -31,7 +31,7 @@ class FLIGHT_CONTROLLER:
 
 		#PUBLISHERS
 		self.publish_pose = rospy.Publisher('/mavros/setpoint_position/local', PoseStamped,queue_size=10)
-		self.publish_pos_tar = rospy.Publisher('/mavros/setpoint_raw/local', PositionTarget,queue_size=0)
+		self.publish_pos_tar = rospy.Publisher('/mavros/setpoint_raw/local', PositionTarget,queue_size=1)
 
 		#SERVICES
 		self.arm_service = rospy.ServiceProxy('/mavros/cmd/arming', CommandBool)
