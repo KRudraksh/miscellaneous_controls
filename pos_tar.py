@@ -149,7 +149,7 @@ if __name__ == '__main__':
 	z = [5,5,5,5,5]
 	v_test = 2
 	v_min=0.1
-	v_max=15
+	v_max=10
 	kp_pos = np.array([19,19,20])
 	kd_pos = np.array([14,14,15])
 	ms = min_snap(x,y,z,v_test,v_min,v_max)
