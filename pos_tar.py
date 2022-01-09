@@ -121,19 +121,19 @@ class FLIGHT_CONTROLLER:
 		#print('Reached ',x,y,z)
 
 
-	def set_pos(self, a_x, a_y, a_z):
+	def set_pos(self, a_x, a_y, a_z, v_x, v_y, v_z, p_x, p_y, p_z):
 		sp = PositionTarget()
 		sp.coordinate_frame = 1
-		sp.type_mask = 3072				
+		sp.type_mask = 3072
 		sp.acceleration_or_force.x = a_x
 		sp.acceleration_or_force.y = a_y
 		sp.acceleration_or_force.z = a_z
-		# sp.velocity.x = v_x
-		# sp.velocity.y = v_y
-		# sp.velocity.z = v_z
-		# sp.position.x = p_x
-		# sp.position.y = p_y
-		# sp.position.z = p_z
+		sp.velocity.x = v_x
+		sp.velocity.y = v_y
+		sp.velocity.z = v_z
+		sp.position.x = p_x
+		sp.position.y = p_y
+		sp.position.z = p_z
 		self.publish_pos_tar.publish(sp)
 
 
@@ -144,12 +144,12 @@ if __name__ == '__main__':
 	rate = rospy.Rate(10)
 	rate_f = rospy.Rate(100)
 
-	x = [0,5,5,0,0]
-	y = [0,0,5,5,0]
-	z = [5,5,5,5,5]
-	v_test = 2
-	v_min=0.1
-	v_max=10
+	x = [0,10,210,210,10,10,210,210,10,0]
+	y = [0,0,0,10,10,0,0,10,10,0]
+	z = [5,5,5,5,5,5,5,5,5,5]
+	v_test = 7
+	v_min= 0.5
+	v_max= 15
 	kp_pos = np.array([19,19,20])
 	kd_pos = np.array([14,14,15])
 	ms = min_snap(x,y,z,v_test,v_min,v_max)
@@ -159,7 +159,7 @@ if __name__ == '__main__':
 	mav.toggle_arm(1)
 	time.sleep(1)
 	mav.set_Guided_mode()
-	mav.takeoff(5)
+	mav.takeoff(2)
 	time.sleep(10)
 	print("Starting")
 	n = len(ms.x_path)
@@ -169,11 +169,20 @@ if __name__ == '__main__':
 	y_actual = []
 	z_actual = []
 	for j in range(n):
-		print(mav.vel.x)
-		a_x = kp_pos[0]*(ms.x_path[j]-mav.pt.x) + kd_pos[0]*(ms.x_dot_path[j]-mav.vel.x) + ms.x_dot_dot_path[j]
-		a_y = kp_pos[1]*(ms.y_path[j]-mav.pt.y) + kd_pos[1]*(ms.y_dot_path[j]-mav.vel.y) + ms.y_dot_dot_path[j]
-		a_z = kp_pos[2]*(ms.z_path[j]-mav.pt.z) + kd_pos[2]*(ms.z_dot_path[j]-mav.vel.z) + ms.z_dot_dot_path[j]
-		mav.set_pos(a_x, a_y, a_z)
+		# print(mav.vel.x)
+		# a_x = kp_pos[0]*(ms.x_path[j]-mav.pt.x) + kd_pos[0]*(ms.x_dot_path[j]-mav.vel.x) + ms.x_dot_dot_path[j]
+		# a_y = kp_pos[1]*(ms.y_path[j]-mav.pt.y) + kd_pos[1]*(ms.y_dot_path[j]-mav.vel.y) + ms.y_dot_dot_path[j]
+		# a_z = kp_pos[2]*(ms.z_path[j]-mav.pt.z) + kd_pos[2]*(ms.z_dot_path[j]-mav.vel.z) + ms.z_dot_dot_path[j]
+		a_x = ms.x_dot_dot_path[j]
+		a_y = ms.y_dot_dot_path[j]
+		a_z = ms.z_dot_dot_path[j]
+		v_x = ms.x_dot_path[j]
+		v_y = ms.y_dot_path[j]
+		v_z = ms.z_dot_path[j]
+		p_x = ms.x_path[j]
+		p_y = ms.y_path[j]
+		p_z = ms.z_path[j]
+		mav.set_pos(a_x, a_y, a_z, v_x, v_y, v_z, p_x, p_y, p_z)
 		x_actual.append(mav.pt.x)
 		y_actual.append(mav.pt.y)
 		z_actual.append(mav.pt.z)
@@ -186,7 +195,7 @@ if __name__ == '__main__':
 		rate.sleep()
 		
 	ax = plt.axes(projection ='3d')
-	ax.scatter(ms.x, ms.y, ms.z, c='black',marker='o',s=20)
+	# ax.scatter(ms.x, ms.y, ms.z, c='black',marker='o',s=20)
 
 	for v in range(ms.m):
 		w,u,a=[],[],[]
@@ -206,7 +215,7 @@ if __name__ == '__main__':
 	ax.plot3D(w, u, a, 'r' ,label='Time Optimized')
 	print(n)	
 	
-	print(x_actual)
+	# print(x_actual)
 	ax.scatter(x_actual, y_actual, z_actual, c='green',marker='o',s=15, label='Actual Trajectory' )
 	plt.legend()
 	plt.show()
