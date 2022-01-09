@@ -78,7 +78,7 @@ class min_snap:
         self.z_dot_path=[]
         self.z_dot_dot_path=[]
 
-        self.dt=0.1
+        self.dt=0.2
 
 
     def time_array(self,v):
